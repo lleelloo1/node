@@ -358,7 +358,7 @@
       'target_name': 'node_etw',
       'type': 'none',
       'conditions': [
-        [ 'node_use_etw=="true"', {
+        [ 'node_use_etw=="true" and node_target_type!="static_library"', {
           'actions': [
             {
               'action_name': 'node_etw',
@@ -379,7 +379,7 @@
       'target_name': 'node_perfctr',
       'type': 'none',
       'conditions': [
-        [ 'node_use_perfctr=="true"', {
+        [ 'node_use_etw=="true" and node_target_type!="static_library"', {
           'actions': [
             {
               'action_name': 'node_perfctr_man',
@@ -441,13 +441,13 @@
             '<(SHARED_INTERMEDIATE_DIR)/node_javascript.cc',
           ],
           'conditions': [
-            [ 'node_use_dtrace=="false" and node_use_etw=="false"', {
+            [ 'node_use_dtrace=="false" and node_use_etw=="false" or node_target_type=="static_library"', {
               'inputs': [ 'src/notrace_macros.py' ]
             }],
-            ['node_use_lttng=="false"', {
+            ['node_use_lttng=="false" or node_target_type=="static_library"', {
               'inputs': [ 'src/nolttng_macros.py' ]
             }],
-            [ 'node_use_perfctr=="false"', {
+            [ 'node_use_perfctr=="false" or node_target_type=="static_library"', {
               'inputs': [ 'src/noperfctr_macros.py' ]
             }]
           ],
@@ -746,6 +746,45 @@
   ], # end targets
 
   'conditions': [
+    [ 'node_target_type=="static_library"', {
+      'targets': [
+        {
+          'target_name': 'static_node',
+          'type': 'executable',
+          'product_name': '<(node_core_target_name)',
+          'dependencies': [
+            '<(node_core_target_name)',
+          ],
+          'sources+': [
+            'src/node_main.cc',
+          ],
+          'include_dirs': [
+            'deps/v8/include',
+          ],
+          'xcode_settings': {
+            'OTHER_LDFLAGS': [
+              '-Wl,-force_load,<(PRODUCT_DIR)/libnode.a',
+            ],
+          },
+          'conditions': [
+            ['OS in "linux freebsd openbsd solaris android aix"', {
+              'ldflags': [
+                '-Wl,--whole-archive,'
+                '<(OBJ_DIR)/libnode.a '
+                '-Wl,--no-whole-archive',
+              ],
+            }],
+            ['OS=="win"', {
+              'msvs_settings': {
+                'VCLinkerTool': {
+                  'AdditionalOptions': ['/WHOLEARCHIVE:<(PRODUCT_DIR)/lib/node.lib'],
+                },
+              }
+            }],
+          ],
+         },
+      ],
+    }],
     ['OS=="aix"', {
       'targets': [
         {

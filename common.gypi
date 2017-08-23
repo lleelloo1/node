@@ -34,6 +34,8 @@
     # Don't use ICU data file (icudtl.dat) from V8, we use our own.
     'icu_use_data_file_flag%': 0,
 
+    # Default library properties for Linux Operating Systems
+
     'conditions': [
       ['GENERATOR=="ninja"', {
         'OBJ_DIR': '<(PRODUCT_DIR)/obj',
@@ -47,18 +49,22 @@
         'v8_postmortem_support%': 'false',
         'OBJ_DIR': '<(PRODUCT_DIR)/obj',
         'V8_BASE': '<(PRODUCT_DIR)/lib/v8_libbase.lib',
+        'lib_prefix': '',
+        'static_lib_suffix': '.lib',
       }, {
         'os_posix': 1,
         'v8_postmortem_support%': 'true',
+        'lib_prefix': 'lib',
+        'static_lib_suffix': '.a',
       }],
       ['OS== "mac"', {
         'OBJ_DIR%': '<(PRODUCT_DIR)/obj.target',
         'V8_BASE': '<(PRODUCT_DIR)/libv8_base.a',
       }],
       ['openssl_fips != ""', {
-        'OPENSSL_PRODUCT': 'libcrypto.a',
+        'OPENSSL_PRODUCT': 'crypto',
       }, {
-        'OPENSSL_PRODUCT': 'libopenssl.a',
+        'OPENSSL_PRODUCT': 'openssl',
       }],
       ['OS=="mac"', {
         'clang%': 1,

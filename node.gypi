@@ -205,7 +205,7 @@
         'src/node_lttng.cc'
       ],
     } ],
-    [ 'node_use_etw=="true"', {
+    [ 'node_use_etw=="true" and node_target_type!="static_library"', {
       'defines': [ 'HAVE_ETW=1' ],
       'dependencies': [ 'node_etw' ],
       'sources': [
@@ -217,7 +217,7 @@
         'tools/msvs/genfiles/node_etw_provider.rc',
       ]
     } ],
-    [ 'node_use_perfctr=="true"', {
+    [ 'node_use_perfctr=="true" and node_target_type!="static_library"', {
       'defines': [ 'HAVE_PERFCTR=1' ],
       'dependencies': [ 'node_perfctr' ],
       'sources': [
@@ -263,7 +263,13 @@
     [ 'OS=="win"', {
       'sources': [
         'src/backtrace_win32.cc',
-        'src/res/node.rc',
+      ],
+      'conditions': [
+        [ 'node_target_type!="static_library"', {
+          'sources': [
+            'src/res/node.rc',
+          ],
+        }],
       ],
       'defines!': [
         'NODE_PLATFORM="win"',

@@ -1,5 +1,8 @@
 {
   'includes': ['../../../config.gypi'],
+  'variables': {
+    'node_target_type%': '',
+  },
   'targets': [
     {
       'target_name': 'binding',
@@ -8,7 +11,7 @@
            'sources': ['binding.cc'],
            'include_dirs': ['../../../deps/openssl/openssl/include'],
            'conditions': [
-              ['OS=="win"', {
+              ['OS=="win" and node_target_type=="static_library"', {
 	        'libraries': ['../../../../$(Configuration)/lib/<(OPENSSL_PRODUCT).lib'],
               }],
             ],

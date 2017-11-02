@@ -14,6 +14,7 @@ COVTESTS ?= test-cov
 GTEST_FILTER ?= "*"
 GNUMAKEFLAGS += --no-print-directory
 GCOV ?= gcov
+OFFLINE ?= false
 
 ifdef JOBS
   PARALLEL_ARGS = -j $(JOBS)
@@ -976,7 +977,7 @@ lint-md-clean:
 	$(RM) -r tools/remark-preset-lint-node/node_modules
 
 lint-md-build:
-ifndef no-internet
+ifeq ($(OFFLINE),false)
 	if [ ! -d tools/remark-cli/node_modules ]; then \
 		cd tools/remark-cli && ../../$(NODE) ../../$(NPM) install; fi
 	if [ ! -d tools/remark-preset-lint-node/node_modules ]; then \
@@ -984,7 +985,7 @@ ifndef no-internet
 endif
 
 lint-md: lint-md-build
-ifndef no-internet
+ifeq ($(OFFLINE),false)
 	@echo "Running Markdown linter..."
 	$(NODE) tools/remark-cli/cli.js -q -f \
 		./*.md doc src lib benchmark tools/doc/ tools/icu/
